@@ -4,6 +4,8 @@ const {creatcar ,updatecar_plate,update_state_car,find_car_by_plate} = require('
 const {find_location_carBy_id} = require('../controller/store');
 const {show_complaint_byname ,getallcomplaint, show_all_client ,Updateclient} = require('../controller/client');
 const {creatcenter} = require('../controller/center')
+const {GET_IMAGE , ShipmentsCompany ,PlanCompany} = require('../controller/company')
+const auth = require('../auth/auth')
 var router = express.Router();
 const passport = require('passport');
 
@@ -11,9 +13,6 @@ const passport = require('passport');
 var router = express.Router();
 
 router.post('/create_center' ,creatcenter);
-
-
-
 router.post('/addstory',createstore);
 router.delete('/deletstory/:id',deletestory);
 router.post('/addcar' , creatcar);
@@ -23,12 +22,14 @@ router.get('/find_store_shipment_byid/:id' , find_story_shipment_by_id);
 router.get('/findallstore' , find_all_story);
 router.put('/updatecarplat/:id' , updatecar_plate );
 router.put('/updatestate/:id' , update_state_car );
-router.get('/findcar_plate' , find_car_by_plate);
+router.get('/findcar_plate/:id' , find_car_by_plate);
 router.get('/show_complaint' ,show_complaint_byname);
 router.get('/show_all_complaint',getallcomplaint );
 router.get('/showall_client' , show_all_client);
 router.put('/update_claient/:id' , Updateclient );
-
+router.get('/GET_IMAGE' ,GET_IMAGE )
+router.get('/ShipmentsCompany' , auth.sign_Company,ShipmentsCompany)
+router.get('/PlanCompany' , auth.sign_Company , PlanCompany)
 
 
 router.get('/auth', function(req, res, next) {

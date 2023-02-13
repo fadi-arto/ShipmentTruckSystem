@@ -16,20 +16,20 @@ passport.deserializeUser((id, done) => {
     if (user) {
       return done(err, user);
     }
-    else{
+    else {
       center.findById(id, (err, usered) => {
-        if(usered){
+        if (usered) {
           return done(err, usered);
         }
-        else{
+        else {
           cars.findById(id, (err, cars) => {
-            if(cars){
+            if (cars) {
               return done(err, cars);
             }
-            else{
+            else {
               clients.findById(id, (err, client) => {
-                if(client){
-                  console.log("add");
+                if (client) {
+                  
                   return done(err, client);
                 }
               })
@@ -50,7 +50,7 @@ passport.use(
       passReqToCallback: true,
     },
     (req, email, password, done) => {
-        company.findOne({ email: email }, (error, users) => {
+      company.findOne({ email: email }, (error, users) => {
         if (error) {
           return done(error, false); // User : false
         }
@@ -65,7 +65,7 @@ passport.use(
 
           return done(null, users);
         } else {
-            console.log("4");
+          console.log("4");
 
           return done(null, false, req.flash("signinError", "worng passwoed"));
         }
@@ -94,9 +94,9 @@ passport.use(
             req.flash("signinError", "user is not found")
           );
         }
-        else  {
+        else {
           return done(null, user);
-        } 
+        }
       });
     }
   )
@@ -144,28 +144,17 @@ passport.use(
       passReqToCallback: true,
     },
     (req, email, password, done) => {
-      console.log(email);
-      console.log(password);
-      cars.findOne({ Email:email}, (error, user) => {
+
+      cars.findOne({ Email: email }, (error, user) => {
         if (error) {
-          console.log("1");
           return done(error, false); // User : false
         }
         if (!user) {
-          console.log("2");
-          return done(
-            null,
-            false,
-            req.flash("signinError", "user is not found")
-          ); // User : false
+          return done(null,false,req.flash("signinError", "user is not found"));
         }
         if (user.Car_plate === password) {
-          console.log("3");
-          console.log(user);
           return done(null, user);
         } else {
-            console.log("4");
-
           return done(null, false, req.flash("signinError", "worng passwoed"));
         }
       });
@@ -198,7 +187,7 @@ passport.use(
             null,
             false,
             req.flash("signinError", "user is not found")
-          ); 
+          );
         }
         if (bcrypt.compareSync(password, user.password)) {
           console.log("2");

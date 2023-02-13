@@ -7,9 +7,9 @@ const flash = require('connect-flash');
 const localStrategy = require('passport-local').Strategy;
 const cors = require('cors');
 const bodyParser = require("body-parser");
-
-
-
+var http = require('http');
+const axios = require('axios');
+const cars = require('./Entity/cars');
 mongoose.set('strictQuery', false);
 
 
@@ -23,15 +23,48 @@ var ClintRouter = require('./routes/clients');
 var CentersRouter = require('./routes/center');
 var CompanyRouter = require('./routes/company');
 const mangadmin = require('./routes/admin');
-
-
 var app = express();
+const server = require('http').createServer(app);
+var io = require('socket.io')(server,{
+  cors:{
+    origin:"*"
+  }
+  })
+  
+   
+    io.on("connection", (socket) => {
+       const token = socket.handshake.query.token;
+      socket.on("latitude", async (arg) => {
+      const updateCarLocation = await cars.findByIdAndUpdate(
+        token,
+        {Location : arg },
+        { safe: true, upsert: true, new: true }
+      )
+      socket.emit("latitude", arg); 
+      socket.emit("latitude", arg); 
+     });
+      });
+      io.on('disconnect', ()=>{
+        console.log('disconnect');
+      })
+  
+      io.on("connection", (socket) => {  
+        console.log("connections");
+        socket.on("testsocket", async (arg) => {
+          console.log(arg); 
+          const updateCarLocation = await cars.findOne({Car_plate : arg});
+          socket.emit("updateCarLocation", updateCarLocation); 
+        });
+       });
+       io.on('disconnect', ()=>{
+         console.log('disconnect');
+       })
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
   });
-
 
 const dbURI = 'mongodb+srv://tarcking:12345@nudetuts.vtv2cor.mongodb.net/note-tuts?retryWrites=true&w=majority' ;  
 mongoose.connect(dbURI , {useNewUrlParser : true , useUnifiedTopology : true})
@@ -41,13 +74,7 @@ mongoose.connect(dbURI , {useNewUrlParser : true , useUnifiedTopology : true})
   .catch((err)=> console.log(err));
 
 
-
-  
-
 require('./config/passport');
-
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -75,8 +102,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-
-app.use('/', indexRouter);
+app.use('/index', indexRouter);
 app.use('/users', usersRouter);
 app.use('/managecar',carRouter);
 app.use('/mangeclint' , ClintRouter);
@@ -103,5 +129,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+server.listen(3000,()=>{
+  console.log('listening on port 3000 ')
+  })
 module.exports = app;

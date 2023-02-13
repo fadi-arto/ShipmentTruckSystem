@@ -10,7 +10,7 @@ company.findOne({email: data.email}).then(companys=>{
         result("email is already in the company",null)
     }
     else{
-        company.create({name : data.name , email: data.email , password : new company().hashPassword(data.password) },(err , results)=>{
+        company.create({name : data.name , email: data.email , password : new company().hashPassword(data.password) , Image : data.Image},(err , results)=>{
             if(err){
            console.log(err)
            result(err, null)

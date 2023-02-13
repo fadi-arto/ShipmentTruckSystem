@@ -3,21 +3,27 @@ const car = require('../../Entity/cars')
 
 
 
-const UpdatecarById = (data, id, result) => {
+const Update_state_car_ById = (data, id, result) => { 
     car.findByIdAndUpdate(id,
-        { Location: data.Location },
-        { new: true },
+        { Status:data.Status},
+        {new: true },
         (err, results) => {
             if (err) {
                 console.log(err);
                 result(err, null);
-            } else {
-                console.log(results);
+            } else {    
+
                 result(null, results);
             }
         })
-
+        
 }
-module.exports = { UpdatecarById };
+
+
+
+
+
+
+module.exports = { Update_state_car_ById };
 
 

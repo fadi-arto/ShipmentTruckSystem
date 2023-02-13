@@ -1,7 +1,7 @@
 const { addcar } = require('../Models/Car/addcar');
 const { deletecarById } = require('../Models/Car/deletcar')
 const { UpdatecarById } = require('../Models/Car/updatecar');
-const { Updatecar_platById } =require('../Models/Car/updatecar_plate');
+const { Updatecar_platById } = require('../Models/Car/updatecar_plate');
 const { Update_state_car_ById } = require('../Models/Car/updatestatus_car')
 const cars = require('../Entity/cars');
 const { request } = require('express');
@@ -14,13 +14,13 @@ const center = require('../Entity/centers');
 const creatcar = (req, res) => {
     const data = req.body;
     console.log(req.isAuthenticated());
-    addcar(data,req.session.passport.user,(err, car) => {
-        if(err) {
+    addcar(data, req.session.passport.user, (err, car) => {
+        if (err) {
             console.log(err)
             res.send(err)
         }
-        else{
-            res.send(car) 
+        else {
+            res.send(car)
         }
     })
 }
@@ -31,13 +31,13 @@ const creatcar = (req, res) => {
 
 
 
-const deletecar = (req,res)=>{
+const deletecar = (req, res) => {
     const id = req.params.id;
-    deletecarById(id ,(err,results)=>{
-        if(err){
+    deletecarById(id, (err, results) => {
+        if (err) {
             res.send(err)
         }
-        else{
+        else {
             res.send(results)
         }
     })
@@ -45,12 +45,12 @@ const deletecar = (req,res)=>{
 }
 
 const Updatecaree = (req, res) => {
-    const data  = req.body;
-    const id    = req.params.id;
-    UpdatecarById(data ,id, (err, results) => {
-        if (err){
+    const data = req.body;
+    const id = req.params.id;
+    UpdatecarById(data, id, (err, results) => {
+        if (err) {
             res.send(err);
-        }else{
+        } else {
             res.send(results);
         }
     });
@@ -59,13 +59,13 @@ const Updatecaree = (req, res) => {
 
 
 const updatecar_plate = (req, res) => {
-    const data  = req.body;
-    const id    = req.params.id;
+    const data = req.body;
+    const id = req.params.id;
     console.log(data);
-    Updatecar_platById(data ,id, (err, results) => {
-        if (err){
+    Updatecar_platById(data, id, (err, results) => {
+        if (err) {
             res.send(err);
-        }else{
+        } else {
             res.send(results);
         }
     });
@@ -76,13 +76,13 @@ const updatecar_plate = (req, res) => {
 
 
 const update_state_car = (req, res) => {
-    const data  = req.body;
-    const id    = req.params.id;
+    const data = req.body;
+    const id = req.params.id;
     console.log(data);
-    Update_state_car_ById(data ,id, (err, results) => {
-        if (err){
+    Update_state_car_ById(data, id, (err, results) => {
+        if (err) {
             res.send(err);
-        }else{
+        } else {
             res.send(results);
         }
     });
@@ -94,133 +94,131 @@ const findall = (req, res) => {
     try {
         const id = req.session.passport.user
         let arr = []
-        cars.find(function(err , results){
-            if(results){
-                center.findById(id,(err,results_center)=>{
-                  for (let index = 0; index < results.length; index++) {
-                    if(results[index].company === results_center.Company){
-                        arr.push(results[index].Location)
+        cars.find(function (err, results) {
+            if (results) {
+                center.findById(id, (err, results_center) => {
+                    for (let index = 0; index < results.length; index++) {
+                        if (results[index].company === results_center.Company) {
+                            arr.push(results[index].Location)
+                        }
                     }
-                  }
-                 console.log(arr);
+                    console.log(arr);
                 })
             }
-            else{
+            else {
                 res.send("not found Car in company")
-              }
+            }
         })
     }
-    catch(err){
+    catch (err) {
         res.send("errore");
 
     }
 }
-const Car_Company = (req, res) => {
+const Car_Company =async (req, res) => {
     try {
         const id = req.session.passport.user
-        console.log(id);
-        company.findById(id,(err, company) =>{
-            if(company){
-                console.log(company);
-                cars.find({company:company.name},function(err , results){
-                    res.send(results)
-                    })
+        const companyname = await company.findById(id)
+        cars.find({ company: companyname.name }, function (err, results) {
+            if (err) {
+                console.log(err);
             }
-            else{
-                console.log("login error");
-            }
+
+            res.send(results)
         })
-      
     }
-    catch(err){
+    catch (err) {
         res.send("errore");
 
     }
 }
 
-const find_car_by_plate = (req,res)=>{
-try{
-//let id = req.params.id;
-let Carplate = req.body.Car_plate;
-
-cars.findOne({Car_plate:Carplate}, function(err,results){
-if(results){
-    console.log("acas");
-res.send(results.Location);
-}
-else{
-    res.send("this Car_plate not find");
-}
-})
-
-
-}
-catch(err){
-    res.send("errore");
-}
+const find_car_by_plate = async (req, res) => {
+    try {
+        let Car_plates = req.params.id;
+        console.log(Car_plates);
+ const CarPlate = await cars.findOne({Car_plate : Car_plates})
+ console.log(CarPlate);
+ res.send(CarPlate.Location)
+    }
+    catch (err) {
+        res.send("errore");
+    }
 };
 
 
-
-
-const fin_car_same_company = (req,res)=>{
+const fin_car_same_company = (req, res) => {
     let id = req.session.passport.user;
-cars.find({},(err,result_car)=>{
-if(err){
-
-    console.log(err);
-    }
-    else{
-company.findById(id,(err,result_comany)=>{
-if(result_comany.name==result_car.name){
-
-    res.send(result_car);
-}
-else{
-
-    res.send("dont have car here")
-}
-
-
-})
-
-    }
-
-})
-
-}
-
-
-
- const profile=(req,res)=>{
-   let id = req.session.passport.user;
-   cars.findById(id,(err,car)=>{
-    if(car){
-        cars.find({Car_plate:car.Car_plate},(err,result_car)=>{
-            if(result_car){
-            res.send(result_car).status(200)
-            
-            }
-            else{
+    cars.find({}, (err, result_car) => {
+        if (err) {
             console.log(err);
-            
-            }
-            
-            
-               })
+        }
+        else {
+            company.findById(id, (err, result_comany) => {
+                if (result_comany.name == result_car.name) {
+
+                    res.send(result_car);
+                }
+                else {
+
+                    res.send("dont have car here")
+                }
+
+
+            })
+
+        }
+
+    })
+
+}
+
+
+
+const profile = (req, res) => {
+    let id = req.session.passport.user;
+    cars.findById(id, (err, car) => {
+        if (car) {
+            cars.find({ Car_plate: car.Car_plate }, (err, result_car) => {
+                if (result_car) {
+                    res.send(result_car).status(200)
+
+                }
+                else {
+                    console.log(err);
+
+                }
+
+
+            })
+        }
+    })
+
+
+}
+
+
+const FindCarByID = (req, res) => {
+    let id = req.params.id
+    cars.findById(id).then((data) => {
+        console.log("on");
+        res.send(data)
+    }).catch((err) => {
+        res.send(err)
+    })
+}
+
+
+const GetlocationVechile = async (req, res) => {
+    const id = req.session.passport.user
+    const Carsloction = await cars.findById(id)
+    if(Carsloction){
+        res.send(Carsloction)
     }
-   })
-   
-
- }
+}
 
 
-
-
-
-
-
-module.exports = { creatcar , deletecar , Updatecaree, updatecar_plate,update_state_car,find_car_by_plate, findall, Car_Company ,fin_car_same_company,profile};
+module.exports = {GetlocationVechile , creatcar, deletecar, Updatecaree, updatecar_plate, FindCarByID, update_state_car, find_car_by_plate, findall, Car_Company, fin_car_same_company, profile };
 
 
 
